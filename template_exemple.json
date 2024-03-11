@@ -1,0 +1,53 @@
+{
+  "applications": [
+    {
+      "name": "sondbeats",
+      "parameter": {
+        "smtp": "smtp.ionos.com",
+        "port": 432,
+        "secure": true
+      },
+      "channels": {
+        "welcome": {
+          "subject":"Welcome to sondbeats !",
+          "email": "no-reply@sondbeats.com",
+          "password": "FA!g-(1U89",
+          "parameter": "!def.parameter"
+        },
+        "force-change-password": {
+          "subject":"Reset password",
+          "email": "no-reply@sondbeats.com",
+          "password": "FA!g-(1U89",
+          "parameter": "!def.parameter"
+        },
+        "staff-contact": {
+          "subject":"Staff contact",
+          "email": "contact.staff@sondbeats.com",
+          "password": "0uyh-&BK£4k7",
+          "parameter":{
+            "smtp": "smtp.gmail.com",
+            "port": 465,
+            "secure": true
+          }
+        }
+      }
+    },
+    {
+      "name": "parrot_clean",
+      "parameter": {
+        "smtp": "smtp.gmail.com",
+        "port": 465,
+        "secure": true
+      },
+      "channels": {
+        "newsletter": {
+          "subject":"new collection !",
+          "email": "no-reply-parrotclean@gmail.com",
+          "password": "",
+          "parameter": "!def.parameter"
+        }
+      }
+    }
+  ]
+}
+
