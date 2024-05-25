@@ -4,8 +4,12 @@ import express, { Application ,Request, Response,NextFunction } from 'express';
 import PathValidator from '../validator/PathValidator';
 import EmailSenderController from '../../adapter/controller/EmailSenderController';
 import EmailSenderService from '../../usecases/services/EmailSenderService';
-import 'dotenv/config';
+import ApplicationController from '../../adapter/controller/ApplicationController';
+import ChannelSettingService from '../../usecases/services/ChannelSettingService';
+import mongoose, { ConnectOptions } from 'mongoose';
 
+import 'dotenv/config';
+import ApplicationRepository from '../../repository/ApplicationRepository';
 
 export default class ExpressApp {
   public app: Application;
@@ -23,7 +27,10 @@ export default class ExpressApp {
     this.app.use(express.json());
     this.app.use(morgan('dev'));
     this.PathValidator = new PathValidator();
-    this.controller = [new EmailSenderController(new EmailSenderService())];
+    this.controller = [
+      new EmailSenderController(new EmailSenderService()),
+      new ApplicationController(new ChannelSettingService(new ApplicationRepository()))
+    ];
     this.injectControllers();
     this.setupErrorHandling();
   }
@@ -74,9 +81,21 @@ export default class ExpressApp {
    * @memberof ExpressApp
    */
   public async startEngine(port: number) {
-
+    try {
+      await mongoose.connect(process.env.MONGODB_URI as string, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    } as ConnectOptions );
+    
+    console.info('Connected to MongoDB');
       this.app.listen(port, () => {
-      console.info(`Service running on http://localhost:${port}`);
-    });
+          console.info(`Service running on http://localhost:${port}`);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+
   }
 }
+
+ 

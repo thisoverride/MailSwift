@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  mailswift:
+    build: .
+    command: sh -c "yarn install && yarn dev"
+    ports:
+      - "8001:8001"
+    environment:
+      MONGODB_URI: "mongodb://mongo_db:27017/mailswift" # Définissez l'URI de la base de données MongoDB
+    volumes:
+      - .:/usr/src/mailswift
+      - /usr/src/mailswift/node_modules
+    depends_on:
+      - mongo_db
+    
+
+  mongo_db:
+    container_name: mongo_container
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
