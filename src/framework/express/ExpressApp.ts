@@ -1,101 +1,50 @@
-import helmet from 'helmet';
-import morgan from 'morgan';
-import express, { Application ,Request, Response,NextFunction } from 'express';
-import PathValidator from '../validator/PathValidator';
-import EmailSenderController from '../../adapter/controller/EmailSenderController';
-import EmailSenderService from '../../usecases/services/EmailSenderService';
-import ApplicationController from '../../adapter/controller/ApplicationController';
-import ChannelSettingService from '../../usecases/services/ChannelSettingService';
+import express, { Application } from 'express';
+import { Container } from 'inversify';
+import HotSpring from './hotspring/core/HotSpring';
 import mongoose, { ConnectOptions } from 'mongoose';
+import EmailService from '../../adapter/services/EmailService';
+import EmailController from '../../adapter/controller/EmailController';
+import { configureMiddleware } from './config/middleware';
+import { configureErrorHandling } from './config/errorHandling';
 
-import 'dotenv/config';
-import ApplicationRepository from '../../repository/ApplicationRepository';
 
 export default class ExpressApp {
-  public app: Application;
-  public controller: Array<any>;
-  public PathValidator: PathValidator;
+  private app: Application;
+  private IoCContainer: Container;
 
-  /**
-   * Creates an instance of ExpressApp.
-   * Initializes middleware and sets up error handling.
-   * @memberof ExpressApp
-   */
-  public constructor() {
+  constructor() {
     this.app = express();
-    this.app.use(helmet());
-    this.app.use(express.json());
-    this.app.use(morgan('dev'));
-    this.PathValidator = new PathValidator();
-    this.controller = [
-      new EmailSenderController(new EmailSenderService()),
-      new ApplicationController(new ChannelSettingService(new ApplicationRepository()))
-    ];
-    this.injectControllers();
-    this.setupErrorHandling();
+    this.IoCContainer = new Container();
+    this._initializeIoCContainer();
+    this._configureApp();
   }
 
-  /**
-   *
-   * Injects controller routes into the Express.
-   * @private
-   * @memberof ExpressApp
-   */
-  private injectControllers(): void {
-    this.controller.forEach((controllerObject) => {
-      controllerObject.ROUTE.forEach((controllerProperties: string) => {
-        const [method, path, controller] = this.PathValidator.checkPath(controllerProperties);
-        if (!(controller in controllerObject) || typeof controllerObject[controller] !== 'function') {
-          throw new Error(`The function ${controller} is not a valid controller in the provided object.`);
-        }        
-        (this.app as unknown as { [key: string]: Function })[method](path, (req: Request, res: Response) =>
-          controllerObject[controller](req, res));
-      });
-    });
+  private _initializeIoCContainer(): void {
+    this.IoCContainer.bind<EmailService>(EmailService).toSelf();
+    this.IoCContainer.bind<EmailController>(EmailController).toSelf();
   }
 
-  /**
-   *
-   * Sets up error handling middleware.
-   * @private
-   * @memberof ExpressApp
-   */
-   private setupErrorHandling(): void {
-    this.app.use((req: Request, res: Response) => {
-      res.status(404).send('')
-    });
-    
-    this.app.use((err: Error, request: Request, response: Response ,next: NextFunction) => {
-      if (err instanceof SyntaxError) {
-        response.status(400).json({message: 'Bad request: the format body is incorrect.'});
-      } else {
-        next(err);
-      }
-    });
+  private _configureApp(): void {
+    configureMiddleware(this.app)
+    HotSpring.bind(this.app, this.IoCContainer, EmailController)
+    configureErrorHandling(this.app)
   }
 
-  /**
-   *
-   * Starts the Express application on the specified port.
-   * @param {number} port
-   * @memberof ExpressApp
-   */
-  public async startEngine(port: number) {
+  public async run(port: number): Promise<void> {
     try {
-      await mongoose.connect(process.env.MONGODB_URI as string, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    } as ConnectOptions );
-    
-    console.info('Connected to MongoDB');
-      this.app.listen(port, () => {
-          console.info(`Service running on http://localhost:${port}`);
-        });
+      this.app.listen(port, async () => {
+        await mongoose.connect(process.env.MONGODB_URI as string, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        } as ConnectOptions );
+        console.info('Connected to MongoDB');
+        console.info('\x1b[1m\x1b[36m%s\x1b[0m', `User Service on http://localhost:${port}`);
+      });
     } catch (error) {
-      console.error(error);
+      throw new Error(`Connection to database failed: ${String(error)}`);
     }
-
   }
 }
 
- 
+
+

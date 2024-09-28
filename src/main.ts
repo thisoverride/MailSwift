@@ -1,5 +1,10 @@
-import ExpressApp from './framework/express/ExpressApp';
+import ExpressApp from "./framework/express/ExpressApp";
 
-  const port: number = 8001;
-  const expressApp = new ExpressApp();
-  expressApp.startEngine(port); 
+class Main {
+    public static start() {
+      const expressApp = new ExpressApp();
+      const port: number = parseInt(process.env.PORT as string, 10) || 8001;
+      expressApp.run(port);
+    }
+}
+Main.start();

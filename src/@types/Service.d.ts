@@ -1,8 +1,6 @@
 export interface EmailPayload {
-  appId: string;
   subject?: string;
-  channel: string;
-  message: string;
+  body: string;
   receiver: string[];
   receiverCc?: string[]
 }
