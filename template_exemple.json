@@ -49,5 +49,114 @@
       }
     }
   ]
+},
+
+
+
+
+
+{
+  "applications": [
+    {
+      "ApplicationId": "bef1c587-09c4-45c7-b152-284c833fcdae",
+      "MessageRequest": {
+        "MessageConfiguration": {
+          "EmailMessage": {
+            "FromAddress": "sonosbooth@booh.com",
+            "Substitutions?": [],
+            "RawEmail?": {
+              "Subject": "Votre sujet par défaut",
+              "Body": "Votre sujet par défaut",
+            },
+          },
+          "TemplateConfiguration": {
+            "TemplateId": "RelancePromotion_sonos",
+            "SubjectOverride": "Votre sujet par défaut",
+            "BodyOverride": "Votre sujet par défaut",
+            "Subject": "Votre sujet par défaut"
+          }
+
+
+        }
+     
+        
+      },
+      "ContextEmail": {
+        "type":"html",
+        "Subject": "Votre sujet par défaut",
+        "body": "Votre sujet par défaut"
+      },
+
+      "EmailOptions": {
+        "TemplateConfiguration": {
+          "TemplateId": "RelancePromotion_sonos",
+          "SubjectOverride": "Votre sujet par défaut",
+          "BodyOverride": "Votre sujet par défaut",
+          "Subject": "Votre sujet par défaut"
+        }
+      }
+    }
+  ]
 }
 
+// {
+//   "applications": [
+//     {
+//       "ApplicationId": "bef1c587-09c4-45c7-b152-284c833fcdae",
+//       "MessageRequest": {
+//         "FromAddress": "sonosbooth@booh.com",
+//         "To": "julien98labars@hotmail.fr",
+        
+//       },
+//       "ContextEmail": {
+//         "type":"html",
+//         "Subject": "Votre sujet par défaut",
+//         "body": "Votre sujet par défaut"
+//       },
+
+//       "EmailOptions": {
+//         "TemplateConfiguration": {
+//           "TemplateId": "RelancePromotion_sonos",
+//           "SubjectOverride": "Votre sujet par défaut",
+//           "BodyOverride": "Votre sujet par défaut",
+//           "Subject": "Votre sujet par défaut"
+//         }
+//       }
+//     }
+//   ]
+// }
+
+
+
+
+
+pour la creation d'une application il faut le nom de l'application.
+une application peux avoir 0 ou n smtp_credentials
+une application peux avoir 0 ou n email_template
+###############
+# application #
+###############
+id
+name
+status
+createAt
+editAt
+
+
+smtp_credentials
+id
+port
+secure
+host
+port
+email
+password
+createAt
+editAt
+
+
+email_template
+id
+name
+subject
+body

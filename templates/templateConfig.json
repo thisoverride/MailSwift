@@ -1,0 +1,15 @@
+{
+  "applications": [
+    {
+      "name": "msn-rebirth",
+      "templates": {
+        "welcome": {
+          "subject": "Bienvenue sur LiveChat"
+        },
+        "goodbye": {
+          "subject": "Merci de nous avoir quittés"
+        }
+      }
+    }
+  ]
+}

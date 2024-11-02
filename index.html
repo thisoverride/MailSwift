@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console de Gestion des Emails</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">{{Title_Serivce}}</div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item" data-section="dashboard">
+                <i class="fas fa-home"></i>
+                <span>Tableau de bord</span>
+            </a>
+            <a href="#" class="nav-item" data-section="applications">
+                <i class="fas fa-th-large"></i>
+                <span>Applications</span>
+            </a>
+            <a href="#" class="nav-item" data-section="templates">
+                <i class="fas fa-envelope"></i>
+                <span>Modèles d'email</span>
+            </a>
+            <a href="#" class="nav-item" data-section="credentials">
+                <i class="fas fa-key"></i>
+                <span>Identifiants</span>
+            </a>
+            <a href="#" class="nav-item" data-section="security">
+                <i class="fas fa-shield-alt"></i>
+                <span>Sécurité</span>
+            </a>
+            <a href="#" class="nav-item" data-section="monitoring">
+                <i class="fas fa-chart-line"></i>
+                <span>Surveillance</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Rechercher des ressources...">
+        </div>
+        <div class="header-actions">
+            <div class="notifications">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-profile">
+                <i class="fas fa-user-circle"></i>
+                <span>Admin</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <!-- Ajout du bouton de toggle de la sidebar -->
+            <div class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div id="applicationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Créer une nouvelle application</h3>
+                <button class="close-modal" onclick="closeModal('application')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="appName">Nom de l'application</label>
+                    <input type="text" id="appName" name="appName" required>
+                </div>
+                <div class="form-group">
+                    <label for="appStatus">Status</label>
+                    <select id="appStatus" name="appStatus">
+                        <option value="Actif">Actif</option>
+                        <option value="Inactif">Inactif</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('application')">Annuler</button>
+                <button class="btn btn-primary" onclick="submitApplication()">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour créer un modèle -->
+    <div id="templateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Créer un nouveau modèle</h3>
+                <button class="close-modal" onclick="closeModal('template')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="templateName">Nom du modèle</label>
+                    <input type="text" id="templateName" name="templateName" required>
+                </div>
+                <div class="form-group">
+                    <label for="templateType">Type</label>
+                    <select id="templateType" name="templateType">
+                        <option value="Marketing">Marketing</option>
+                        <option value="Onboarding">Onboarding</option>
+                        <option value="Notification">Notification</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('template')">Annuler</button>
+                <button class="btn btn-primary" onclick="submitTemplate()">Créer</button>
+            </div>
+        </div>
+    </div>
+        <!-- Applications Section -->
+        <section class="card" id="applications">
+            <div class="card-header">
+                <h2>Applications</h2>
+                <button class="create-button">
+                    <i class="fas fa-plus"></i>
+                    Créer une application
+                </button>
+            </div>
+            <div class="table-container">
+                <table id="applicationsTable">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Status</th>
+                            <th>Modèles</th>
+                            <th>Dernière utilisation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div>Service Client</div>
+                                <small style="color: #666;">app-1234</small>
+                            </td>
+                            <td><span class="status-badge status-active">Actif</span></td>
+                            <td>5</td>
+                            <td>30/10/2024</td>
+                            <td class="actions">
+                                <button class="action-button"><i class="fas fa-edit"></i></button>
+                                <button class="action-button"><i class="fas fa-trash"></i></button>
+                                <button class="action-button"><i class="fas fa-external-link-alt"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Templates Section -->
+        <section class="card" id="templates">
+            <div class="card-header">
+                <h2>Modèles d'email</h2>
+                <button class="create-button">
+                    <i class="fas fa-plus"></i>
+                    Créer un modèle
+                </button>
+            </div>
+            <div class="table-container">
+                <table id="templatesTable">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Type</th>
+                            <th>Applications</th>
+                            <th>Dernière modification</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div>Newsletter Mensuelle</div>
+                                <small style="color: #666;">template-5678</small>
+                            </td>
+                            <td><span class="status-badge">Marketing</span></td>
+                            <td>Service Client, Marketing</td>
+                            <td>29/10/2024</td>
+                            <td class="actions">
+                                <button class="action-button"><i class="fas fa-edit"></i></button>
+                                <button class="action-button"><i class="fas fa-trash"></i></button>
+                                <button class="action-button"><i class="fas fa-external-link-alt"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="section" id="dashboard">
+          <div class="page-header">
+              <h2>Tableau de bord</h2>
+              <button class="create-button">
+                  <i class="fas fa-download"></i>
+                  Exporter le rapport
+              </button>
+          </div>
+          
+          <div class="dashboard-grid">
+              <div class="stat-card">
+                  <h3>Emails envoyés (30 jours)</h3>
+                  <div class="stat-value">24,521</div>
+              </div>
+              <div class="stat-card">
+                  <h3>Taux d'ouverture moyen</h3>
+                  <div class="stat-value">68.5%</div>
+              </div>
+              <div class="stat-card">
+                  <h3>Templates actifs</h3>
+                  <div class="stat-value">12</div>
+              </div>
+              <div class="stat-card">
+                  <h3>Applications actives</h3>
+                  <div class="stat-value">8</div>
+              </div>
+          </div>
+
+          <div class="chart-container">
+              <h3>Activité des envois d'emails</h3>
+              <!-- Placeholder pour le graphique -->
+              <div id="emailActivityChart" style="height: 300px;"></div>
+          </div>
+      </section>
+
+      <!-- ... Applications et Templates sections existantes ... -->
+
+      <!-- Credentials Section -->
+      <section class="section" id="credentials">
+          <div class="page-header">
+              <h2>Identifiants</h2>
+              <button class="create-button">
+                  <i class="fas fa-plus"></i>
+                  Ajouter des identifiants
+              </button>
+          </div>
+
+          <div class="credentials-grid">
+              <div class="credential-card">
+                  <div class="credential-header">
+                      <h3>SMTP Principal</h3>
+                      <span class="status-badge status-active">Actif</span>
+                  </div>
+                  <div class="form-group">
+                      <label>Serveur SMTP</label>
+                      <input type="text" value="smtp.example.com" readonly>
+                  </div>
+                  <div class="form-group">
+                      <label>Port</label>
+                      <input type="text" value="587" readonly>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-secondary">Modifier</button>
+                      <button class="btn btn-primary">Tester la connexion</button>
+                  </div>
+              </div>
+
+              <div class="credential-card">
+                  <div class="credential-header">
+                      <h3>API SendGrid</h3>
+                      <span class="status-badge status-active">Actif</span>
+                  </div>
+                  <div class="form-group">
+                      <label>Clé API</label>
+                      <input type="password" value="••••••••••••••••" readonly>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-secondary">Modifier</button>
+                      <button class="btn btn-primary">Vérifier la clé</button>
+                  </div>
+              </div>
+          </div>
+      </section>
+
+      <!-- Security Section -->
+      <section class="section" id="security">
+          <div class="page-header">
+              <h2>Sécurité</h2>
+          </div>
+
+          <div class="security-settings">
+              <div class="setting-item">
+                  <div class="setting-header">
+                      <div>
+                          <h3>Double authentification</h3>
+                          <p>Requiert une confirmation supplémentaire lors de la connexion</p>
+                      </div>
+                      <label class="switch">
+                          <input type="checkbox" checked>
+                          <span class="slider"></span>
+                      </label>
+                  </div>
+              </div>
+
+              <div class="setting-item">
+                  <div class="setting-header">
+                      <div>
+                          <h3>Limitation des tentatives de connexion</h3>
+                          <p>Bloque les tentatives après 5 échecs</p>
+                      </div>
+                      <label class="switch">
+                          <input type="checkbox" checked>
+                          <span class="slider"></span>
+                      </label>
+                  </div>
+              </div>
+
+              <div class="setting-item">
+                  <div class="setting-header">
+                      <div>
+                          <h3>Journalisation des activités</h3>
+                          <p>Enregistre toutes les actions des utilisateurs</p>
+                      </div>
+                      <label class="switch">
+                          <input type="checkbox" checked>
+                          <span class="slider"></span>
+                      </label>
+                  </div>
+              </div>
+          </div>
+      </section>
+
+      <!-- Monitoring Section -->
+      <section class="section" id="monitoring">
+          <div class="page-header">
+              <h2>Surveillance</h2>
+              <div class="header-actions">
+                  <select class="form-control">
+                      <option>Dernières 24 heures</option>
+                      <option>7 derniers jours</option>
+                      <option>30 derniers jours</option>
+                  </select>
+                  <button class="create-button">
+                      <i class="fas fa-sync"></i>
+                      Actualiser
+                  </button>
+              </div>
+          </div>
+
+          <div class="monitoring-grid">
+              <div class="chart-container">
+                  <h3>Performance des envois</h3>
+                  <!-- Placeholder pour le graphique -->
+                  <div id="performanceChart" style="height: 300px;"></div>
+              </div>
+
+              <div class="card">
+                  <div class="card-header">
+                      <h3>Alertes récentes</h3>
+                  </div>
+                  <div class="alert-card alert-error">
+                      <h4>Échec de connexion SMTP</h4>
+                      <p>Il y a 2 heures</p>
+                  </div>
+                  <div class="alert-card alert-warning">
+                      <h4>Taux de rebond élevé</h4>
+                      <p>Il y a 5 heures</p>
+                  </div>
+                  <div class="alert-card alert-info">
+                      <h4>Mise à jour de sécurité disponible</h4>
+                      <p>Il y a 12 heures</p>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="section" id="template-editor">
+        <div class="page-header">
+            <div>
+                <h2>Modifier le template</h2>
+                <p>Newsletter Mensuelle</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary">
+                    <i class="fas fa-eye"></i>
+                    Aperçu
+                </button>
+                <button class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Enregistrer
+                </button>
+            </div>
+        </div>
+
+        <div class="editor-container">
+            <!-- Sidebar gauche - Éléments et composants -->
+            <div class="editor-sidebar">
+                <div class="sidebar-section">
+                    <h3>Éléments</h3>
+                    <div class="elements-grid">
+                        <div class="element-item" draggable="true">
+                            <i class="fas fa-font"></i>
+                            Texte
+                        </div>
+                        <div class="element-item" draggable="true">
+                            <i class="fas fa-image"></i>
+                            Image
+                        </div>
+                        <div class="element-item" draggable="true">
+                            <i class="fas fa-button"></i>
+                            Bouton
+                        </div>
+                        <div class="element-item" draggable="true">
+                            <i class="fas fa-columns"></i>
+                            Colonnes
+                        </div>
+                        <div class="element-item" draggable="true">
+                            <i class="fas fa-grip-lines"></i>
+                            Séparateur
+                        </div>
+                        <div class="element-item" draggable="true">
+                            <i class="fas fa-social"></i>
+                            Social
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Variables disponibles</h3>
+                    <div class="variables-list">
+                        <div class="variable-item">
+                            <span>{{nom_client}}</span>
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="variable-item">
+                            <span>{{email_client}}</span>
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="variable-item">
+                            <span>{{date_envoi}}</span>
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone principale - Éditeur -->
+            <div class="editor-main">
+                <div class="editor-toolbar">
+                    <div class="toolbar-group">
+                        <button class="toolbar-button">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="toolbar-button">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="toolbar-button">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button class="toolbar-button">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button class="toolbar-button">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="toolbar-button">
+                            <i class="fas fa-align-left"></i>
+                        </button>
+                        <button class="toolbar-button">
+                            <i class="fas fa-align-center"></i>
+                        </button>
+                        <button class="toolbar-button">
+                            <i class="fas fa-align-right"></i>
+                        </button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="toolbar-button">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <button class="toolbar-button">
+                            <i class="fas fa-image"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="editor-canvas">
+                    <!-- Zone d'édition du template -->
+                    <div class="template-preview">
+                        <h1>Newsletter Mensuelle</h1>
+                        <p>Bonjour {{nom_client}},</p>
+                        <p>Voici les dernières nouvelles...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar droite - Propriétés -->
+            <div class="editor-sidebar">
+                <div class="sidebar-section">
+                    <h3>Propriétés</h3>
+                    <div class="properties-list">
+                        <div class="property-item">
+                            <label>Police</label>
+                            <select>
+                                <option>Arial</option>
+                                <option>Helvetica</option>
+                                <option>Times New Roman</option>
+                            </select>
+                        </div>
+                        <div class="property-item">
+                            <label>Taille</label>
+                            <select>
+                                <option>12px</option>
+                                <option>14px</option>
+                                <option>16px</option>
+                                <option>18px</option>
+                            </select>
+                        </div>
+                        <div class="property-item">
+                            <label>Couleur</label>
+                            <div class="color-picker">
+                                <div class="color-item" style="background-color: #000000;"></div>
+                                <div class="color-item" style="background-color: #FF0000;"></div>
+                                <div class="color-item" style="background-color: #00FF00;"></div>
+                                <div class="color-item" style="background-color: #0000FF;"></div>
+                                <div class="color-item" style="background-color: #FFFF00;"></div>
+                                <div class="color-item" style="background-color: #FF00FF;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Aperçu Responsive</h3>
+                    <div class="preview-modes">
+                        <button class="preview-mode active">
+                            <i class="fas fa-desktop"></i>
+                        </button>
+                        <button class="preview-mode">
+                            <i class="fas fa-tablet-alt"></i>
+                        </button>
+                        <button class="preview-mode">
+                            <i class="fas fa-mobile-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <!-- <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          // Gestion du drag and drop des éléments
+          const elements = document.querySelectorAll('.element-item');
+          const canvas = document.querySelector('.template-preview');
+
+          elements.forEach(element => {
+              element.addEventListener('dragstart', (e) => {
+                  e.dataTransfer.setData('text/plain', element.innerHTML);
+              });
+          });
+
+          canvas.addEventListener('dragover', (e) => {
+              e.preventDefault();
+          });
+
+          canvas.addEventListener('drop', (e) => {
+              e.preventDefault();
+              const data = e.dataTransfer.getData('text/plain');
+              const newElement = document.createElement('div');
+              newElement.innerHTML = data;
+              canvas.appendChild(newElement);
+          });
+
+          // Gestion des boutons de la barre d'outils
+          const toolbarButtons = document.querySelectorAll('.toolbar-button');
+          toolbarButtons.forEach(button => {
+              button.addEventListener('click', () => {
+                  button.classList.toggle('active');
+              });
+          });
+
+          // Gestion des modes d'aperçu
+          const previewModes = document.querySelectorAll('.preview-mode');
+          previewModes.forEach(mode => {
+              mode.addEventListener('click', () => {
+                  previewModes.forEach(m => m.classList.remove('active'));
+                  mode.classList.add('active');
+              });
+          });
+
+          // Gestion du sélecteur de couleurs
+          const colorItems = document.querySelectorAll('.color-item');
+          colorItems.forEach(item => {
+              item.addEventListener('click', () => {
+                  colorItems.forEach(i => i.classList.remove('active'));
+                  item.classList.add('active');
+              });
+          });
+      });
+  </script> -->
+    
+    <!-- Script -->
+    <script>
+        // Données de l'application
+        let state = {
+            applications: [
+                { id: 'app-1', name: 'Service Client', status: 'Actif', templates: 5, lastUsed: '2024-10-30' },
+                { id: 'app-2', name: 'Marketing', status: 'Actif', templates: 3, lastUsed: '2024-10-29' }
+            ],
+            templates: [
+                { id: 'tmp-1', name: 'Newsletter', type: 'Marketing', apps: ['Service Client'], lastModified: '2024-10-30' },
+                { id: 'tmp-2', name: 'Bienvenue', type: 'Onboarding', apps: ['Marketing'], lastModified: '2024-10-29' }
+            ],
+            activeSection: 'dashboard'
+        };
+
+        // Gestion de la navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = item.getAttribute('data-section');
+                changeSection(section);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Gestionnaire pour le bouton "Créer une application"
+            document.querySelector('#applications .create-button').addEventListener('click', () => {
+                showModal('application');
+            });
+
+            // Gestionnaire pour le bouton "Créer un modèle"
+            document.querySelector('#templates .create-button').addEventListener('click', () => {
+                showModal('template');
+            });
+        });
+
+        function submitApplication() {
+            const name = document.getElementById('appName').value;
+            const status = document.getElementById('appStatus').value;
+            
+            if (name) {
+                addApplication(name);
+                closeModal('application');
+                document.getElementById('appName').value = '';
+            }
+        }
+
+        function submitTemplate() {
+            const name = document.getElementById('templateName').value;
+            const type = document.getElementById('templateType').value;
+            
+            if (name) {
+                addTemplate(name, type);
+                closeModal('template');
+                document.getElementById('templateName').value = '';
+            }
+        }
+
+        // Fermer la modale si l'utilisateur clique en dehors
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        function changeSection(sectionId) {
+            // Mise à jour des classes actives
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+
+            // Afficher la section correspondante
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelector(`#${sectionId}`).classList.add('active');
+
+            state.activeSection = sectionId;
+            updateContent();
+        }
+
+        // Toggle Sidebar
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            updateMainContentMargin();
+        });
+
+        function updateMainContentMargin() {
+            const mainContent = document.querySelector('.main-content');
+            const header = document.querySelector('.header');
+            const sidebarWidth = sidebar.classList.contains('collapsed') ? '60px' : '250px';
+            mainContent.style.marginLeft = sidebarWidth;
+            header.style.left = sidebarWidth;
+        }
+
+        // Modales
+        function showModal(type) {
+            const modal = document.querySelector(`#${type}Modal`);
+            modal.style.display = 'block';
+        }
+
+        function closeModal(type) {
+            const modal = document.querySelector(`#${type}Modal`);
+            modal.style.display = 'none';
+        }
+
+        // CRUD Operations
+        function addApplication(name) {
+            const newApp = {
+                id: 'app-' + Date.now(),
+                name: name,
+                status: 'Actif',
+                templates: 0,
+                lastUsed: new Date().toLocaleDateString()
+            };
+            state.applications.push(newApp);
+            updateContent();
+        }
+
+        function addTemplate(name, type) {
+            const newTemplate = {
+                id: 'tmp-' + Date.now(),
+                name: name,
+                type: type,
+                apps: [],
+                lastModified: new Date().toLocaleDateString()
+            };
+            state.templates.push(newTemplate);
+            updateContent();
+        }
+
+        function updateContent() {
+            // Mettre à jour le tableau des applications et des modèles
+            const applicationsTableBody = document.querySelector('#applicationsTable tbody');
+            const templatesTableBody = document.querySelector('#templatesTable tbody');
+
+            applicationsTableBody.innerHTML = '';
+            templatesTableBody.innerHTML = '';
+
+            state.applications.forEach(app => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><div>${app.name}</div><small style="color: #666;">${app.id}</small></td>
+                    <td><span class="status-badge status-active">${app.status}</span></td>
+                    <td>${app.templates}</td>
+                    <td>${app.lastUsed}</td>
+                    <td class="actions">
+                        <button class="action-button"><i class="fas fa-edit"></i></button>
+                        <button class="action-button"><i class="fas fa-trash"></i></button>
+                        <button class="action-button"><i class="fas fa-external-link-alt"></i></button>
+                    </td>
+                `;
+                applicationsTableBody.appendChild(row);
+            });
+
+            state.templates.forEach(template => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><div>${template.name}</div><small style="color: #666;">${template.id}</small></td>
+                    <td><span class="status-badge">${template.type}</span></td>
+                    <td>${template.apps.join(', ')}</td>
+                    <td>${template.lastModified}</td>
+                    <td class="actions">
+                        <button class="action-button"><i class="fas fa-edit"></i></button>
+                        <button class="action-button"><i class="fas fa-trash"></i></button>
+                        <button class="action-button"><i class="fas fa-external-link-alt"></i></button>
+                    </td>
+                `;
+                templatesTableBody.appendChild(row);
+            });
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            updateContent(); // Initialiser le contenu
+        });
+
+
+        
+    </script>
+</body>
+</html>

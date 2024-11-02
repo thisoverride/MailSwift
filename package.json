@@ -4,7 +4,7 @@
   "main": "main.js",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev src/main.ts",
+    "dev": "ts-node-dev --env-file .env ./src/main.ts",
     "prod": "node build/main.js",
     "build": "tsc",
     "test": "jest"
@@ -27,9 +27,12 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "handlebars": "^4.7.8",
     "helmet": "^7.1.0",
     "mongoose": "^8.2.1",
     "morgan": "^1.10.0",
-    "nodemailer": "^6.9.7"
+    "nodemailer": "^6.9.7",
+    "nodemailer-express-handlebars": "^7.0.0",
+    "uuid": "^11.0.2"
   }
 }
